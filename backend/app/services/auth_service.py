@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 
 from app.models.user import User
 
+from app.services.token_service import TokenService
+
 from app.repositories.auth_repository import (
     AuthRepository
 )
@@ -82,10 +84,49 @@ class AuthService:
                 "Invalid credentials"
             )
 
-        token = create_access_token(
+        access_token = create_access_token(
             {
                 "sub": str(user.id)
             }
         )
 
-        return token
+        refresh_token = (
+            TokenService
+            .generate_refresh_token(
+                db,
+                user.id
+            )
+        )
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer"
+        }
+    @staticmethod
+    def reset_password(
+        db: Session,
+        email: str,
+        new_password: str
+    ):
+    
+        user = (
+            AuthRepository
+            .get_user_by_email(
+                db,
+                email
+            )
+        )
+    
+        if not user:
+            raise ValueError(
+                "User not found"
+            )
+    
+        user.password_hash = hash_password(
+            new_password
+        )
+    
+        db.commit()
+    
+        return True
