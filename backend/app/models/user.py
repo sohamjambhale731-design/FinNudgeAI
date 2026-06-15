@@ -61,7 +61,7 @@ class User(Base):
 
     # Goals
     goals = relationship("Goal", back_populates="user")
-
+  
     # AI Nudges
     ai_nudges = relationship("AINudge", back_populates="user")
 
