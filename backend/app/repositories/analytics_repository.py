@@ -83,4 +83,4 @@ class AnalyticsRepository:
                 AINudge.category == category
             )
             .all()
-        )
+        )   
