@@ -87,3 +87,63 @@ def get_savings_insights(
             month
         )
     )
+
+@router.get("/monthly-report/{month}")
+def get_monthly_report(
+    month: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        AnalyticsService
+        .get_monthly_report(
+            db,
+            current_user.id,
+            month
+        )
+    )
+
+@router.get("/trends")
+def get_trends(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        AnalyticsService
+        .get_trends(
+            db,
+            current_user.id
+        )
+    )
+
+@router.get("/category-comparison/{month}")
+def get_category_comparison(
+    month: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        AnalyticsService
+        .get_category_comparison(
+            db,
+            current_user.id,
+            month
+        )
+    )
+
+@router.get("/goal-report")
+def get_goal_report(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        AnalyticsService
+        .get_goal_report(
+            db,
+            current_user.id
+        )
+    )

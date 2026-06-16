@@ -211,9 +211,9 @@ class AnalyticsService:
         user_id: int,
         month: str
     ):
-    
+
         month = month.strip().title()
-    
+
         incomes = (
             IncomeRepository
             .get_income_by_user(
@@ -221,7 +221,7 @@ class AnalyticsService:
                 user_id
             )
         )
-    
+
         budgets = (
             ExpenseRepository
             .get_variable_budgets(
@@ -229,7 +229,7 @@ class AnalyticsService:
                 user_id
             )
         )
-    
+
         fixed_expenses = (
             ExpenseRepository
             .get_fixed_expenses(
@@ -237,7 +237,7 @@ class AnalyticsService:
                 user_id
             )
         )
-    
+
         goals = (
             GoalRepository
             .get_goals(
@@ -245,18 +245,18 @@ class AnalyticsService:
                 user_id
             )
         )
-    
+
         total_income = sum(
             income.total_income
             for income in incomes
             if income.month == month
         )
-    
+
         total_fixed_expense = sum(
             expense.amount
             for expense in fixed_expenses
         )
-    
+
         budget = next(
             (
                 b
@@ -265,41 +265,41 @@ class AnalyticsService:
             ),
             None
         )
-    
+
         allocated_budget = (
             budget.allocated_budget
             if budget
             else 0
         )
-    
+
         savings_potential = max(
             0,
             total_income
             - total_fixed_expense
             - allocated_budget
         )
-    
+
         goal_predictions = []
-    
+
         for goal in goals:
-        
+
             remaining_amount = (
                 goal.target_amount
                 - goal.current_amount
             )
-    
+
             if savings_potential <= 0:
-            
+
                 months_to_complete = None
-    
+
             else:
-            
+
                 months_to_complete = round(
                     remaining_amount
                     / savings_potential,
                     1
                 )
-    
+
             goal_predictions.append({
                 "goal_id": goal.goal_id,
                 "goal_name": goal.goal_name,
@@ -307,17 +307,17 @@ class AnalyticsService:
                 "months_to_complete":
                     months_to_complete
             })
-    
+
         if (
             savings_potential > 0
             and len(goals) > 0
         ):
-    
+
             highest_priority_goal = min(
                 goals,
                 key=lambda g: g.priority
             )
-    
+
             existing_nudges = (
                 AnalyticsRepository
                 .get_nudges_by_category(
@@ -326,9 +326,9 @@ class AnalyticsService:
                     "Goal"
                 )
             )
-    
+
             if len(existing_nudges) == 0:
-            
+
                 nudge = AINudge(
                     user_id=user_id,
                     message=(
@@ -340,12 +340,12 @@ class AnalyticsService:
                     priority="Medium",
                     category="Goal"
                 )
-    
+
                 AnalyticsRepository.create_nudge(
                     db,
                     nudge
                 )
-    
+
         return {
             "month": month,
             "savings_potential":
@@ -353,5 +353,189 @@ class AnalyticsService:
             "goal_predictions":
                 goal_predictions
         }
+    
+    @staticmethod
+    def get_monthly_report(
+        db: Session,
+        user_id: int,
+        month: str
+    ):
+
+        month = month.strip().title()
+
+        incomes = (
+            IncomeRepository
+            .get_income_by_user(
+                db,
+                user_id
+            )
+        )
+
+        fixed_expenses = (
+            ExpenseRepository
+            .get_fixed_expenses(
+                db,
+                user_id
+            )
+        )
+
+        variable_expenses = (
+            ExpenseRepository
+            .get_variable_expenses(
+                db,
+                user_id
+            )
+        )
+
+        total_income = sum(
+            income.total_income
+            for income in incomes
+            if income.month == month
+        )
+
+        total_fixed_expense = sum(
+            expense.amount
+            for expense in fixed_expenses
+        )
+
+        total_variable_expense = sum(
+            expense.amount
+            for expense in variable_expenses
+            if expense.date.strftime("%B") == month
+        )
+
+        total_expense = (
+            total_fixed_expense
+            + total_variable_expense
+        )
+
+        total_saved = max(
+            0,
+            total_income - total_expense
+        )
+
+        savings_rate = (
+            round(
+                (total_saved / total_income) * 100,
+                2
+            )
+            if total_income > 0
+            else 0
+        )
+
+        return {
+            "month": month,
+            "income": total_income,
+            "fixed_expenses": total_fixed_expense,
+            "variable_expenses": total_variable_expense,
+            "total_expense": total_expense,
+            "total_saved": total_saved,
+            "savings_rate": savings_rate
+        }
+    
+    @staticmethod
+    def get_trends(
+        db: Session,
+        user_id: int
+    ):
+
+        analytics = (
+            AnalyticsRepository
+            .get_analytics(
+                db,
+                user_id
+            )
+        )
+
+        return [
+            {
+                "month": record.month,
+                "total_spent": record.total_spent,
+                "total_saved": record.total_saved,
+                "savings_rate": record.savings_rate,
+                "financial_health_score":
+                    record.financial_health_score
+            }
+            for record in analytics
+        ]
+    
+    @staticmethod
+    def get_category_comparison(
+        db: Session,
+        user_id: int,
+        month: str
+    ):
+
+        month = month.strip().title()
+
+        variable_expenses = (
+            ExpenseRepository
+            .get_variable_expenses(
+                db,
+                user_id
+            )
+        )
+
+        category_totals = {}
+
+        for expense in variable_expenses:
+
+            if expense.date.strftime("%B") != month:
+                continue
+
+            category = expense.category.strip().title()
+
+            category_totals[category] = (
+                category_totals.get(
+                    category,
+                    0
+                )
+                + expense.amount
+            )
+
+        return category_totals
+    
+    @staticmethod
+    def get_goal_report(
+        db: Session,
+        user_id: int
+    ):
+
+        goals = (
+            GoalRepository
+            .get_goals(
+                db,
+                user_id
+            )
+        )
+
+        report = []
+
+        for goal in goals:
+
+            completion_percentage = round(
+                (
+                    goal.current_amount
+                    / goal.target_amount
+                ) * 100,
+                2
+            )
+
+            report.append({
+                "goal_name": goal.goal_name,
+                "target_amount":
+                    goal.target_amount,
+                "current_amount":
+                    goal.current_amount,
+                "remaining_amount":
+                    goal.target_amount
+                    - goal.current_amount,
+                "completion_percentage":
+                    completion_percentage,
+                "status":
+                    goal.status
+            })
+
+        return report
     
     
