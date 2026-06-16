@@ -13,6 +13,10 @@ from app.repositories.expense_repository import (
     ExpenseRepository
 )
 
+from app.repositories.streak_repository import (
+    StreakRepository
+)
+
 from app.repositories.analytics_repository import (
     AnalyticsRepository
 )
@@ -272,6 +276,29 @@ class AnalyticsService:
             else 0
         )
 
+        variable_expenses = (
+            ExpenseRepository
+            .get_variable_expenses(
+                db,
+                user_id
+            )
+        )
+        
+        spent_amount = sum(
+            expense.amount
+            for expense in variable_expenses
+            if expense.date.strftime("%B") == month
+        )
+        
+        budget_usage = 0
+        
+        if allocated_budget > 0:
+        
+            budget_usage = (
+                spent_amount
+                / allocated_budget
+            ) * 100
+
         savings_potential = max(
             0,
             total_income
@@ -344,6 +371,85 @@ class AnalyticsService:
                 AnalyticsRepository.create_nudge(
                     db,
                     nudge
+                )
+
+        existing_budget_nudges = (
+            AnalyticsRepository
+            .get_nudges_by_category(
+                db,
+                user_id,
+                "Budget"
+            )
+        )
+        
+        if len(existing_budget_nudges) == 0:
+        
+            if budget_usage >= 100:
+            
+                AnalyticsRepository.create_nudge(
+                    db,
+                    AINudge(
+                        user_id=user_id,
+                        message=(
+                            "You have exceeded your Flex Spend budget."
+                        ),
+                        priority="High",
+                        category="Budget"
+                    )
+                )
+        
+            elif budget_usage >= 80:
+            
+                AnalyticsRepository.create_nudge(
+                    db,
+                    AINudge(
+                        user_id=user_id,
+                        message=(
+                            f"You have used "
+                            f"{round(budget_usage, 2)}% "
+                            f"of your Flex Spend budget."
+                        ),
+                        priority="High",
+                        category="Budget"
+                    )
+                )
+
+        streak = (
+            StreakRepository
+            .get_streak(
+                db,
+                user_id
+            )
+        )
+        
+        if streak:
+        
+            existing_streak_nudges = (
+                AnalyticsRepository
+                .get_nudges_by_category(
+                    db,
+                    user_id,
+                    "Streak"
+                )
+            )
+        
+            if (
+                streak.current_streak >= 7
+                and len(existing_streak_nudges) == 0
+            ):
+        
+                AnalyticsRepository.create_nudge(
+                    db,
+                    AINudge(
+                        user_id=user_id,
+                        message=(
+                            f"Awesome! You are on a "
+                            f"{streak.current_streak}-day "
+                            f"money streak."
+                        ),
+                        priority="Low",
+                        category="Streak"
+                    )
                 )
 
         return {
@@ -538,4 +644,4 @@ class AnalyticsService:
 
         return report
     
-    
+

@@ -7,6 +7,7 @@ from app.api.v1.endpoints import expense
 from app.api.v1.endpoints import goal
 from app.api.v1.endpoints import analytics
 from app.api.v1.endpoints import dashboard
+from app.api.v1.endpoints import streak
 
 api_router = APIRouter()
 
@@ -43,4 +44,10 @@ api_router.include_router(
     dashboard.router,
     prefix="/dashboard",
     tags=["Dashboard"]
+)
+
+api_router.include_router(
+    streak.router,
+    prefix="/streak",
+    tags=["Streak"]
 )
