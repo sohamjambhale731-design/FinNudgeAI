@@ -7,11 +7,28 @@ import '../features/expenses/screens/expense_screen.dart';
 import '../features/expenses/screens/add_expense_screen.dart';
 import '../features/expenses/screens/expense_history_screen.dart';
 import '../features/goals/screens/goal_screen.dart';
+import '../features/goals/screens/add_goal_screen.dart';
+import '../features/goals/screens/goal_detail_screen.dart';
 import '../features/insights/screens/insight_screen.dart';
+import '../features/insights/screens/insight_details_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
-    
+    GoRoute(path: '/insight-details',
+    builder: (context, state) => 
+    const InsightDetailsScreen(),
+    ),
+
+    GoRoute(path: '/goal-details',
+    builder: (context, state) => 
+    const GoalDetailsScreen(),
+    ),
+
+    GoRoute(path: '/add-goal',
+    builder: (context, state) =>
+    const AddGoalScreen(),
+    ),
+
     GoRoute(
       path: '/expense-history',
       builder: (context, state) =>

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/colors/app_colors.dart';
+
 class FinNudgeBottomNavBar extends StatelessWidget {
   final int currentIndex;
 
@@ -9,62 +11,129 @@ class FinNudgeBottomNavBar extends StatelessWidget {
     required this.currentIndex,
   });
 
+  static const _items = [
+    (
+      icon: Icons.dashboard_rounded,
+      label: 'Dashboard',
+      route: '/',
+    ),
+    (
+      icon: Icons.account_balance_wallet_rounded,
+      label: 'Income',
+      route: '/income',
+    ),
+    (
+      icon: Icons.receipt_long_rounded,
+      label: 'Expenses',
+      route: '/expenses',
+    ),
+    (
+      icon: Icons.flag_rounded,
+      label: 'Goals',
+      route: '/goals',
+    ),
+    (
+      icon: Icons.auto_graph_rounded,
+      label: 'Insights',
+      route: '/insights',
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      type: BottomNavigationBarType.fixed,
-
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go('/');
-            break;
-
-          case 1:
-            context.go('/income');
-            break;
-
-          case 2:
-            context.go('/expenses');
-            break;
-
-          case 3:
-            context.go('/goals');
-            break;
-
-          case 4:
-            context.go('/insights');
-            break;
-        }
-      },
-
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard),
-          label: 'Dashboard',
+    return SafeArea(
+      child: Container(
+        height: 72,
+        margin: const EdgeInsets.fromLTRB(
+          16,
+          0,
+          16,
+          12,
         ),
-
-        BottomNavigationBarItem(
-          icon: Icon(Icons.account_balance_wallet),
-          label: 'Income',
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 6,
         ),
-
-        BottomNavigationBarItem(
-          icon: Icon(Icons.receipt_long),
-          label: 'Expenses',
+        decoration: BoxDecoration(
+          color: const Color(0xFFF0ECE7),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(
+                alpha: 0.05,
+              ),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
+        child: Row(
+          children: List.generate(
+            _items.length,
+            (index) {
+              final item = _items[index];
+              final isSelected =
+                  currentIndex == index;
 
-        BottomNavigationBarItem(
-          icon: Icon(Icons.flag),
-          label: 'Goals',
-        ),
+              return Expanded(
+                child: InkWell(
+                  borderRadius:
+                      BorderRadius.circular(16),
+                  onTap: () =>
+                      context.go(item.route),
+                  child: AnimatedContainer(
+                    duration:
+                        const Duration(milliseconds: 200),
+                    padding:
+                        const EdgeInsets.symmetric(
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.transparent,
+                      borderRadius:
+                          BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment:
+                          MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          item.icon,
+                          size: 20,
+                          color: isSelected
+                              ? AppColors.goal
+                              : Colors.black54,
+                        ),
 
-        BottomNavigationBarItem(
-          icon: Icon(Icons.insights),
-          label: 'Insights',
+                        const SizedBox(height: 2),
+
+                        Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow:
+                              TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: isSelected
+                                ? AppColors.goal
+                                : Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
-      ],
+      ),
     );
   }
 }
