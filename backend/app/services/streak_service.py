@@ -108,3 +108,82 @@ class StreakService:
             }
 
         return streak
+    
+    @staticmethod
+    def get_streak_analytics(
+        db: Session,
+        user_id: int
+    ):
+
+        streak = (
+            StreakRepository
+            .get_streak(
+                db,
+                user_id
+            )
+        )
+
+        if not streak:
+
+            return {
+                "current_streak": 0,
+                "longest_streak": 0,
+                "level": "Bronze"
+            }
+
+        current_streak = (
+            streak.current_streak
+        )
+
+        if current_streak >= 30:
+            level = "Platinum"
+        elif current_streak >= 14:
+            level = "Gold"
+        elif current_streak >= 7:
+            level = "Silver"
+        else:
+            level = "Bronze"
+
+        return {
+            "current_streak":
+                streak.current_streak,
+            "longest_streak":
+                streak.longest_streak,
+            "level":
+                level
+        }
+    
+    @staticmethod
+    def get_weekly_progress(
+        db: Session,
+        user_id: int
+    ):
+
+        streak = (
+            StreakRepository
+            .get_streak(
+                db,
+                user_id
+            )
+        )
+
+        current_streak = (
+            streak.current_streak
+            if streak
+            else 0
+        )
+
+        weekly_progress = min(
+            current_streak,
+            7
+        )
+
+        return {
+            "weekly_goal": 7,
+            "completed_days":
+                weekly_progress,
+            "remaining_days":
+                7 - weekly_progress
+        }
+    
+    

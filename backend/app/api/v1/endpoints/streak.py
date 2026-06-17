@@ -50,3 +50,31 @@ def get_streak(
             current_user.id
         )
     )
+
+@router.get("/analytics")
+def get_streak_analytics(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        StreakService
+        .get_streak_analytics(
+            db,
+            current_user.id
+        )
+    )
+
+@router.get("/weekly-progress")
+def get_weekly_progress(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        StreakService
+        .get_weekly_progress(
+            db,
+            current_user.id
+        )
+    )

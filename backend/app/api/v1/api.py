@@ -8,6 +8,7 @@ from app.api.v1.endpoints import goal
 from app.api.v1.endpoints import analytics
 from app.api.v1.endpoints import dashboard
 from app.api.v1.endpoints import streak
+from app.api.v1.endpoints import notification
 
 api_router = APIRouter()
 
@@ -50,4 +51,10 @@ api_router.include_router(
     streak.router,
     prefix="/streak",
     tags=["Streak"]
+)
+
+api_router.include_router(
+    notification.router,
+    prefix="/notifications",
+    tags=["Notifications"]
 )

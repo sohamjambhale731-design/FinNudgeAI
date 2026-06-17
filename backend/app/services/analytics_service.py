@@ -97,6 +97,98 @@ class AnalyticsService:
             if expense.date.strftime("%B") == month
         )
 
+        budgets = (
+            ExpenseRepository
+            .get_variable_budgets(
+                db,
+                user_id
+            )
+        )
+
+        budget = next(
+            (
+                b
+                for b in budgets
+                if b.month == month
+            ),
+            None
+        )
+
+        allocated_budget = (
+            budget.allocated_budget
+            if budget
+            else 0
+        )
+
+        budget_usage = 0
+
+        if allocated_budget > 0:
+
+            budget_usage = (
+                total_variable_expense
+                / allocated_budget
+            ) * 100
+
+        goals = (
+            GoalRepository
+            .get_goals(
+                db,
+                user_id
+            )
+        )
+
+        goal_score = 0
+
+        if goals:
+
+            total_completion = 0
+
+            for goal in goals:
+
+                completion = (
+                    goal.current_amount
+                    / goal.target_amount
+                ) * 100
+
+                total_completion += completion
+
+            average_completion = (
+                total_completion
+                / len(goals)
+            )
+
+            if average_completion >= 75:
+                goal_score = 20
+            elif average_completion >= 50:
+                goal_score = 15
+            elif average_completion >= 25:
+                goal_score = 10
+            else:
+                goal_score = 5
+
+        streak = (
+            StreakRepository
+            .get_streak(
+                db,
+                user_id
+            )
+        )
+
+        current_streak = (
+            streak.current_streak
+            if streak
+            else 0
+        )
+
+        if current_streak >= 30:
+            consistency_score = 10
+        elif current_streak >= 14:
+            consistency_score = 7
+        elif current_streak >= 7:
+            consistency_score = 5
+        else:
+            consistency_score = 2
+
         total_spent = (
             total_fixed_expense
             + total_variable_expense
@@ -115,16 +207,38 @@ class AnalyticsService:
                 / total_income
             ) * 100
 
+        # Savings Score (40)
+
         if savings_rate >= 30:
-            financial_health_score = 100
+            savings_score = 40
         elif savings_rate >= 20:
-            financial_health_score = 80
+            savings_score = 30
         elif savings_rate >= 10:
-            financial_health_score = 60
+            savings_score = 20
         elif savings_rate >= 5:
-            financial_health_score = 40
+            savings_score = 10
         else:
-            financial_health_score = 20
+            savings_score = 0
+
+        # Budget Score (30)
+
+        if budget_usage <= 80:
+            budget_score = 30
+        elif budget_usage <= 90:
+            budget_score = 20
+        elif budget_usage <= 100:
+            budget_score = 10
+        else:
+            budget_score = 0
+
+        # Final Health Score (100)
+
+        financial_health_score = (
+            savings_score
+            + budget_score
+            + goal_score
+            + consistency_score
+        )
 
         analytics = Analytics(
             user_id=user_id,
@@ -421,7 +535,7 @@ class AnalyticsService:
                 user_id
             )
         )
-        
+
         if streak:
         
             existing_streak_nudges = (
@@ -432,12 +546,12 @@ class AnalyticsService:
                     "Streak"
                 )
             )
-        
+
             if (
                 streak.current_streak >= 7
                 and len(existing_streak_nudges) == 0
             ):
-        
+
                 AnalyticsRepository.create_nudge(
                     db,
                     AINudge(
@@ -644,4 +758,52 @@ class AnalyticsService:
 
         return report
     
+    @staticmethod
+    def get_health_score_history(
+        db: Session,
+        user_id: int
+    ):
+
+        analytics = (
+            AnalyticsRepository
+            .get_analytics(
+                db,
+                user_id
+            )
+        )
+
+        return [
+            {
+                "month": record.month,
+                "financial_health_score":
+                    record.financial_health_score
+            }
+            for record in analytics
+        ]
+    
+
+    @staticmethod
+    def get_health_score_chart(
+        db: Session,
+        user_id: int
+    ):
+
+        analytics = (
+            AnalyticsRepository
+            .get_analytics(
+                db,
+                user_id
+            )
+        )
+
+        return {
+            "labels": [
+                record.month
+                for record in analytics
+            ],
+            "scores": [
+                record.financial_health_score
+                for record in analytics
+            ]
+        }
 

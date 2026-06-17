@@ -20,3 +20,4 @@ class GoalUpdate(BaseModel):
 class GoalContributionCreate(BaseModel):
     amount: float
     date: date
+

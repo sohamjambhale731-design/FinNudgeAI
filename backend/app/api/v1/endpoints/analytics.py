@@ -147,3 +147,31 @@ def get_goal_report(
             current_user.id
         )
     )
+
+@router.get("/health-score-history")
+def get_health_score_history(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        AnalyticsService
+        .get_health_score_history(
+            db,
+            current_user.id
+        )
+    )
+
+@router.get("/health-score-chart")
+def get_health_score_chart(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        AnalyticsService
+        .get_health_score_chart(
+            db,
+            current_user.id
+        )
+    )
