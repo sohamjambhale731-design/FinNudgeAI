@@ -29,3 +29,4 @@ from .refresh_token import RefreshToken
 from .notification import Notification
 
 from .user_activity_log import UserActivityLog
+

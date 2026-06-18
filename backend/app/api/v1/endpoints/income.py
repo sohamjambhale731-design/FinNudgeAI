@@ -5,6 +5,11 @@ from fastapi import (
 )
 
 from sqlalchemy.orm import Session
+from app.schemas.income_schema import (
+    IncomeCreate,
+    AdditionalIncomeCreate,
+    IncomeUpdate
+)
 
 from app.database.dependencies import (
     get_db
@@ -81,4 +86,58 @@ def create_additional_income(
         )
     )
 
-    return income
+    return {
+        "additional_income_id": income.additional_income_id,
+        "source_name": income.source_name,
+        "amount": income.amount,
+        "date": income.date,
+        "message": "Additional income added successfully"
+    }
+
+@router.put("/{income_id}")
+def update_income(
+    income_id: int,
+    request: IncomeUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        IncomeService
+        .update_income(
+            db,
+            income_id,
+            request.primary_income,
+            current_user.id
+        )
+    )
+
+@router.delete("/{income_id}")
+def delete_income(
+    income_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        IncomeService
+        .delete_income(
+            db,
+            income_id,
+            current_user.id
+        )
+    )
+
+@router.get("/analytics")
+def get_income_analytics(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        IncomeService
+        .get_income_analytics(
+            db,
+            current_user.id
+        )
+    )

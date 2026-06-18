@@ -4,7 +4,7 @@ from app.models.income import (
     Income,
     AdditionalIncome
 )
-
+from sqlalchemy import func
 
 class IncomeRepository:
 
@@ -76,3 +76,29 @@ class IncomeRepository:
             )
             .all()
         )
+    
+    @staticmethod
+    def get_income_by_user_and_month(
+        db: Session,
+        user_id: int,
+        month: str
+    ):
+        return (
+            db.query(Income)
+            .filter(
+                Income.user_id == user_id,
+                func.lower(Income.month) == month.lower()
+            )
+            .first()
+        )
+    
+    @staticmethod
+    def update_income(
+        db: Session,
+        income: Income
+    ):
+        db.add(income)
+        db.commit()
+        db.refresh(income)
+    
+        return income
