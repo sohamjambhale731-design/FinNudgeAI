@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 
 class AuthTextField extends StatelessWidget {
+
   final String hintText;
   final bool obscureText;
   final IconData? prefixIcon;
+  final TextEditingController? controller;
 
   const AuthTextField({
     super.key,
     required this.hintText,
     this.obscureText = false,
     this.prefixIcon,
+    this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
+
     return TextField(
+
+      controller: controller,
+
       obscureText: obscureText,
 
       style: const TextStyle(
