@@ -257,3 +257,32 @@ class IncomeService:
             })
 
         return analytics
+    
+    @staticmethod
+    def get_income_history(
+        db: Session,
+        user_id: int
+    ):
+    
+        records = (
+            IncomeRepository
+            .get_additional_income(
+                db,
+                user_id
+            )
+        )
+    
+        return [
+            {
+                "source_name":
+                    record.source_name,
+    
+                "amount":
+                    record.amount,
+    
+                "date":
+                    record.date
+            }
+    
+            for record in records
+        ]

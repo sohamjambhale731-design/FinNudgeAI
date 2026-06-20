@@ -1,20 +1,44 @@
 import 'package:flutter/material.dart';
-
 import '../../../shared/widgets/bottom_nav_bar.dart';
-
-import '../data/mock_dashboard_data.dart';
-
 import '../widgets/ai_insight_card.dart';
+import '../../../core/api/dashboard_api.dart';
+import '../models/wallet_data.dart';
 import '../widgets/goal_progress_card.dart';
 import '../widgets/monthly_snapshot_card.dart';
 import '../widgets/streak_card.dart';
 import '../widgets/wallet_summary_card.dart';
+import '../models/dashboard_data.dart';
+import '../models/dashboard_response.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  State<DashboardScreen> createState() =>
+      _DashboardScreenState();
+}
+
+class _DashboardScreenState
+    extends State<DashboardScreen> {
+
+  late Future<Map<String, dynamic>>
+      dashboardFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    dashboardFuture =
+        DashboardApi.getDashboard(
+      "June",
+    );
+  }
+
+  @override
+  Widget build(
+      BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       bottomNavigationBar: const FinNudgeBottomNavBar(
@@ -24,9 +48,31 @@ class DashboardScreen extends StatelessWidget {
         title: const Text('FinNudge AI'),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: LayoutBuilder(
+      body: FutureBuilder<
+          Map<String, dynamic>>(
+        future: dashboardFuture,
+      
+        builder:
+            (context, snapshot) {
+            
+          if (!snapshot.hasData) {
+            return const Center(
+              child:
+                  CircularProgressIndicator(),
+            );
+          }
+      
+          final dashboardData =
+              snapshot.data!;
+
+          final dashboard =
+              DashboardData.fromJson(
+                dashboardData,
+              );
+              return Padding(
+                padding: const EdgeInsets.all(20),
+                child: LayoutBuilder(
+
           builder: (context, constraints) {
             // MOBILE
             if (constraints.maxWidth < 900) {
@@ -34,31 +80,31 @@ class DashboardScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     WalletSummaryCard(
-                      data: MockDashboardData.wallet,
+                      data: dashboard.wallet,
                     ),
 
                     const SizedBox(height: 16),
 
                     GoalProgressCard(
-                      data: MockDashboardData.goal,
+                      data: dashboard.goal,
                     ),
 
                     const SizedBox(height: 16),
 
                     AIInsightCard(
-                      data: MockDashboardData.insight,
+                      data: dashboard.insight,
                     ),
 
                     const SizedBox(height: 16),
 
                     MonthlySnapshotCard(
-                      data: MockDashboardData.snapshot,
+                      data: dashboard.snapshot,
                     ),
 
                     const SizedBox(height: 16),
 
                     StreakCard(
-                      data: MockDashboardData.streak,
+                      data: dashboard.streak,
                     ),
                   ],
                 ),
@@ -76,7 +122,7 @@ class DashboardScreen extends StatelessWidget {
                   /// LEFT COLUMN
                   Expanded(
                     child: WalletSummaryCard(
-                      data: MockDashboardData.wallet,
+                      data: dashboard.wallet,
                       height: availableHeight,
                     ),
                   ),
@@ -91,7 +137,7 @@ class DashboardScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: AIInsightCard(
-                              data: MockDashboardData.insight,
+                              data: dashboard.insight,
                             ),
                           ),
 
@@ -99,7 +145,7 @@ class DashboardScreen extends StatelessWidget {
 
                           Expanded(
                             child: MonthlySnapshotCard(
-                              data: MockDashboardData.snapshot,
+                              data: dashboard.snapshot,
                             ),
                           ),
 
@@ -107,7 +153,7 @@ class DashboardScreen extends StatelessWidget {
 
                           Expanded(
                             child: StreakCard(
-                              data: MockDashboardData.streak,
+                              data: dashboard.streak,
                             ),
                           ),
                         ],
@@ -120,7 +166,7 @@ class DashboardScreen extends StatelessWidget {
                   /// RIGHT COLUMN
                   Expanded(
                     child: GoalProgressCard(
-                      data: MockDashboardData.goal,
+                      data: dashboard.goal,
                       height: availableHeight,
                     ),
                   ),
@@ -129,7 +175,9 @@ class DashboardScreen extends StatelessWidget {
             );
           },
         ),
-      ),
-    );
+      );
+    },
+  ),
+);
   }
 }

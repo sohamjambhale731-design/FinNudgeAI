@@ -218,7 +218,9 @@ class GoalProgressCard extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 Text(
-                  data.upcomingGoals.first,
+                  data.upcomingGoals.isNotEmpty
+                      ? data.upcomingGoals.first
+                      : "No Upcoming Goal",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,

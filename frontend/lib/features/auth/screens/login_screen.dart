@@ -6,6 +6,11 @@
   import '../widgets/auth_button.dart';
   import '../widgets/auth_textfield.dart';
   import '../../../core/storage/token_storage.dart';
+  import '../../dashboard/screens/dashboard_screen.dart';
+  import '../../../core/api/dashboard_api.dart';
+  import '../../../core/api/income_api.dart';
+  import 'package:go_router/go_router.dart';
+
 
   import 'forgot_password_screen.dart';
   import 'register_screen.dart';
@@ -31,6 +36,8 @@
 
     @override
     Widget build(BuildContext context) {
+      print("LOGIN SCREEN BUILD");
+
       return Scaffold(
         backgroundColor:
             AppColors.background,
@@ -233,46 +240,60 @@
 
                     AuthButton(
                       text: "Login",
-                    
+
                       onPressed: () async {
+                        print("LOGIN BUTTON CLICKED");
                       
                         try {
                         
                           final result =
                               await AuthApi.login(
-                              
-                            email:
-                                emailController.text,
-                    
-                            password:
-                                passwordController.text,
-                    
+                             email: emailController.text,
+                             password: passwordController.text,
                           );
-                    
+
                           await TokenStorage.saveTokens(
-                          
                             accessToken:
                                 result["access_token"],
-                    
                             refreshToken:
                                 result["refresh_token"],
-                    
                           );
-                    
+
+                          print("STEP 1");
+                          final dashboardData =
+                              await DashboardApi.getDashboard(
+                            "June",
+                          );
+
+                          final income =
+                              await IncomeApi.getIncome();
+
+                          print(
+                            "INCOME DATA",
+                          );
+
+                          print(
+                            income,
+                          );
+
+                          print("STEP 2");
+
+                          print(dashboardData);
+
                           final token =
                               await TokenStorage
                                   .getAccessToken();
-                    
+
                           print(
                             token,
                           );
-                    
+
                           print(
                             result,
                           );
-                    
+
                           if (context.mounted) {
-                          
+
                             ScaffoldMessenger.of(
                               context,
                             ).showSnackBar(
@@ -283,12 +304,14 @@
                                 ),
                               ),
                             );
+
+                            context.go('/dashboard');
                           }
-                    
+
                         } catch (e) {
                         
                           print(e);
-                    
+
                           if (context.mounted) {
                           
                             ScaffoldMessenger.of(

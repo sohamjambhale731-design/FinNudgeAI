@@ -141,3 +141,19 @@ def get_income_analytics(
             current_user.id
         )
     )
+
+@router.get("/history")
+def get_income_history(
+    current_user: User = Depends(
+        get_current_user
+    ),
+    db: Session = Depends(get_db)
+):
+
+    return (
+        IncomeService
+        .get_income_history(
+            db,
+            current_user.id
+        )
+    )

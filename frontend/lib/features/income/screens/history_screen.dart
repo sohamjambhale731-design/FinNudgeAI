@@ -1,9 +1,28 @@
 import 'package:flutter/material.dart';
+import '../../../core/api/income_history_api.dart';
 
-import '../models/mock_income_history.dart';
 
-class IncomeHistoryScreen extends StatelessWidget {
+class IncomeHistoryScreen extends StatefulWidget {
   const IncomeHistoryScreen({super.key});
+
+  @override
+  State<IncomeHistoryScreen> createState() =>
+      _IncomeHistoryScreenState();
+}
+
+class _IncomeHistoryScreenState
+    extends State<IncomeHistoryScreen> {
+
+  late Future<List<dynamic>>
+      historyFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    historyFuture =
+        IncomeHistoryApi.getHistory();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,22 +31,54 @@ class IncomeHistoryScreen extends StatelessWidget {
         title: const Text('Income History'),
       ),
 
-      body: ListView.builder(
-        itemCount: mockIncomeHistory.length,
+      body: FutureBuilder<List<dynamic>>(
+        future: historyFuture,
 
-        itemBuilder: (context, index) {
-          final income = mockIncomeHistory[index];
+        builder: (context, snapshot) {
+        
+          if (!snapshot.hasData) {
+            return const Center(
+              child:
+                  CircularProgressIndicator(),
+            );
+          }
 
-          return ListTile(
-            leading: const Icon(Icons.payments),
+          final history =
+              snapshot.data!;
 
-            title: Text(income.source),
+          if (history.isEmpty) {
+            return const Center(
+              child: Text(
+                "No income history found",
+              ),
+            );
+          }
 
-            subtitle: Text(income.date),
+          return ListView.builder(
+            itemCount: history.length,
 
-            trailing: Text(
-              '₹${income.amount.toStringAsFixed(0)}',
-            ),
+            itemBuilder: (context, index) {
+            
+              final income =
+                  history[index];
+
+              return ListTile(
+                leading:
+                    const Icon(Icons.payments),
+
+                title: Text(
+                  income["source_name"],
+                ),
+
+                subtitle: Text(
+                  income["date"],
+                ),
+
+                trailing: Text(
+                  '₹${income["amount"]}',
+                ),
+              );
+            },
           );
         },
       ),

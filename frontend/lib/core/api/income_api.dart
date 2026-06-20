@@ -1,39 +1,28 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 import '../constants/api_constants.dart';
 import '../storage/token_storage.dart';
 
-class DashboardApi {
+class IncomeApi {
 
-  static Future<Map<String, dynamic>>
-      getDashboard(
-    String month,
-  ) async {
+  static Future<List<dynamic>>
+     getIncome() async {
 
     final token =
         await TokenStorage.getAccessToken();
-
-    print(
-      "TOKEN: $token",
-    );
 
     final response =
         await http.get(
 
       Uri.parse(
-        '${ApiConstants.baseUrl}/dashboard/$month',
+        '${ApiConstants.baseUrl}/income',
       ),
 
       headers: {
         'Authorization':
             'Bearer $token',
       },
-    );
-
-    print(
-      response.body,
     );
 
     return jsonDecode(

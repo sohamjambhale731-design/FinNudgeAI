@@ -102,3 +102,19 @@ class IncomeRepository:
         db.refresh(income)
     
         return income
+    
+    @staticmethod
+    def get_additional_income(
+        db: Session,
+        user_id: int
+    ):
+        return (
+            db.query(AdditionalIncome)
+            .filter(
+                AdditionalIncome.user_id == user_id
+            )
+            .order_by(
+                AdditionalIncome.date.desc()
+            )
+            .all()
+        )
