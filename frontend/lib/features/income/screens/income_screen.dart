@@ -126,15 +126,22 @@ class _IncomeScreenState
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        context.push(
+                      onPressed: () async {
+                        final result =
+                            await context.push(
                           '/add-income',
+                          extra: income,
                         );
+
+                        if (result == true) {
+                          setState(() {
+                            incomeFuture =
+                                IncomeApi.getIncome();
+                          });
+                        }
                       },
-                      icon:
-                          const Icon(Icons.add),
-                      label:
-                          const Text('Update Income'),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Update Income'),
                     ),
                   ),
 
@@ -143,10 +150,16 @@ class _IncomeScreenState
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        context.push(
+                      onPressed: () async {
+                        final result = await context.push(
                           '/add-additional-income',
                         );
+
+                        if (result == true) {
+                          setState(() {
+                            incomeFuture = IncomeApi.getIncome();
+                          });
+                        }
                       },
                       icon: const Icon(
                         Icons.trending_up,
@@ -156,6 +169,7 @@ class _IncomeScreenState
                       ),
                     ),
                   ),
+
 
                   const SizedBox(height: 12),
 

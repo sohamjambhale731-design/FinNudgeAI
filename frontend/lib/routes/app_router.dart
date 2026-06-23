@@ -7,6 +7,8 @@ import '../features/dashboard/screens/dashboard_screen.dart';
 import '../features/income/screens/income_screen.dart';
 import '../features/income/screens/add_income_screen.dart';
 import '../features/income/screens/history_screen.dart';
+import '../features/income/models/income_data.dart';
+
 
 import '../features/expenses/screens/expense_screen.dart';
 import '../features/expenses/screens/add_expense_screen.dart';
@@ -47,8 +49,16 @@ final GoRouter appRouter = GoRouter(
 
     GoRoute(
       path: '/add-income',
-      builder: (context, state) =>
-          const AddIncomeScreen(),
+    
+      builder: (context, state) {
+      
+        final income =
+            state.extra as IncomeData;
+    
+        return AddIncomeScreen(
+          income: income,
+        );
+      },
     ),
 
     GoRoute(
