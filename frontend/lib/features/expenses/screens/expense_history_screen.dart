@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/mock_expense_history.dart';
+import '../../../core/api/expense_api.dart';
 
 class ExpenseHistoryScreen extends StatelessWidget {
   const ExpenseHistoryScreen({super.key});
@@ -12,22 +12,43 @@ class ExpenseHistoryScreen extends StatelessWidget {
         title: const Text('Expense History'),
       ),
 
-      body: ListView.builder(
-        itemCount: mockExpenseHistory.length,
+      body: FutureBuilder<List<dynamic>>(
+        future: ExpenseApi.getExpenses(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-        itemBuilder: (context, index) {
-          final expense = mockExpenseHistory[index];
+          final history = snapshot.data!;
 
-          return ListTile(
-            leading: const Icon(Icons.receipt_long),
+          if (history.isEmpty) {
+            return const Center(
+              child: Text(
+                "No expense history found",
+              ),
+            );
+          }
 
-            title: Text(expense.category),
+          return ListView.builder(
+            itemCount: history.length,
+            itemBuilder: (context, index) {
+              final expense = history[index];
 
-            subtitle: Text(expense.date),
-
-            trailing: Text(
-              '₹${expense.amount.toStringAsFixed(0)}',
-            ),
+              return ListTile(
+                leading: const Icon(Icons.receipt_long),
+                title: Text(
+                  expense["category"],
+                ),
+                subtitle: Text(
+                  expense["date"],
+                ),
+                trailing: Text(
+                  '₹${expense["amount"]}',
+                ),
+              );
+            },
           );
         },
       ),

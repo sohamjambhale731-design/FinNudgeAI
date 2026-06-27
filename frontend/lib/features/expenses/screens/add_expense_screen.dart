@@ -1,32 +1,101 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class AddExpenseScreen extends StatelessWidget {
+import '../../../core/api/expense_api.dart';
+
+class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
+
+  @override
+  State<AddExpenseScreen> createState() =>
+      _AddExpenseScreenState();
+}
+
+class _AddExpenseScreenState
+    extends State<AddExpenseScreen> {
+
+  final categoryController =
+      TextEditingController();
+
+  final amountController =
+      TextEditingController();
+
+  final noteController =
+      TextEditingController();
+
+  final dateController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Expense'),
+        title: const Text(
+          'Add Expense',
+        ),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
+
         child: Column(
           children: [
+
             TextField(
-              decoration: const InputDecoration(
-                labelText: 'Expense Amount',
-                border: OutlineInputBorder(),
+              controller:
+                  categoryController,
+
+              decoration:
+                  const InputDecoration(
+                labelText: 'Category',
+                border:
+                    OutlineInputBorder(),
               ),
-              keyboardType: TextInputType.number,
             ),
 
             const SizedBox(height: 16),
 
             TextField(
-              decoration: const InputDecoration(
-                labelText: 'Category',
-                border: OutlineInputBorder(),
+              controller:
+                  amountController,
+
+              keyboardType:
+                  TextInputType.number,
+
+              decoration:
+                  const InputDecoration(
+                labelText: 'Amount',
+                border:
+                    OutlineInputBorder(),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            TextField(
+              controller:
+                  noteController,
+
+              decoration:
+                  const InputDecoration(
+                labelText: 'Note',
+                border:
+                    OutlineInputBorder(),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            TextField(
+              controller:
+                  dateController,
+
+              decoration:
+                  const InputDecoration(
+                labelText:
+                    'Date (YYYY-MM-DD)',
+                border:
+                    OutlineInputBorder(),
               ),
             ),
 
@@ -34,9 +103,60 @@ class AddExpenseScreen extends StatelessWidget {
 
             SizedBox(
               width: double.infinity,
+
               child: ElevatedButton(
-                onPressed: () {},
-                child: const Text('Save Expense'),
+                onPressed: () async {
+
+                  try {
+
+                    await ExpenseApi.addExpense(
+                      category:
+                          categoryController.text,
+
+                      amount:
+                          double.parse(
+                        amountController.text,
+                      ),
+
+                      note:
+                          noteController.text,
+
+                      date:
+                          dateController.text,
+                    );
+
+                    if (context.mounted) {
+
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Expense Added",
+                          ),
+                        ),
+                      );
+
+                      context.pop(true);
+                    }
+
+                  } catch (e) {
+
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          e.toString(),
+                        ),
+                      ),
+                    );
+                  }
+                },
+
+                child: const Text(
+                  'Save Expense',
+                ),
               ),
             ),
           ],
@@ -45,3 +165,4 @@ class AddExpenseScreen extends StatelessWidget {
     );
   }
 }
+

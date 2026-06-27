@@ -27,14 +27,26 @@ class _DashboardScreenState
       dashboardFuture;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
     dashboardFuture =
         DashboardApi.getDashboard(
       "June",
     );
   }
+
+  Future<void> loadDashboard() async {
+    if (!mounted) return;
+    setState(() {
+      dashboardFuture =
+          DashboardApi.getDashboard(
+        "June",
+      );
+    });
+  }
+
+
 
   @override
   Widget build(

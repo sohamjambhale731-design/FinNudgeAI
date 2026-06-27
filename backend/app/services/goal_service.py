@@ -9,6 +9,12 @@ from app.repositories.goal_repository import (
     GoalRepository
 )
 
+from app.models.expense import VariableExpense
+
+from app.repositories.expense_repository import (
+    ExpenseRepository
+)
+
 
 class GoalService:
 
@@ -218,6 +224,19 @@ class GoalService:
         GoalRepository.create_contribution(
             db,
             contribution
+        )
+
+        expense = VariableExpense(
+            user_id=user_id,
+            category="Savings",
+            amount=amount,
+            note=f"Contribution to {goal.goal_name}",
+            date=contribution_date
+        )
+
+        ExpenseRepository.create_variable_expense(
+            db,
+            expense
         )
 
         goal.current_amount += amount

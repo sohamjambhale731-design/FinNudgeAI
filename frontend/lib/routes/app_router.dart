@@ -10,13 +10,21 @@ import '../features/income/screens/history_screen.dart';
 import '../features/income/models/income_data.dart';
 
 
+import '../features/expenses/models/expense_data.dart';
+import '../features/expenses/models/budget_data.dart';
+
 import '../features/expenses/screens/expense_screen.dart';
+
 import '../features/expenses/screens/add_expense_screen.dart';
 import '../features/expenses/screens/expense_history_screen.dart';
+import '../features/expenses/screens/update_expense_screen.dart';
+import '../features/expenses/screens/update_budget_screen.dart';
 
 import '../features/goals/screens/goal_screen.dart';
 import '../features/goals/screens/add_goal_screen.dart';
 import '../features/goals/screens/goal_detail_screen.dart';
+import '../features/goals/models/goal_data.dart';
+
 
 import '../features/insights/screens/insight_screen.dart';
 import '../features/insights/screens/insight_details_screen.dart';
@@ -92,7 +100,29 @@ final GoRouter appRouter = GoRouter(
           const ExpenseHistoryScreen(),
     ),
 
+    GoRoute(
+      path: '/update-expense',
+      builder: (context, state) {
+        final expense = state.extra as ExpenseData;
+        return UpdateExpenseScreen(
+          expense: expense,
+        );
+
+      },
+    ),
+
+    GoRoute(
+      path: '/update-budget',
+      builder: (context, state) {
+        final budget = state.extra as BudgetData;
+        return UpdateBudgetScreen(
+          budget: budget,
+        );
+      },
+    ),
+
     /// GOALS
+
     GoRoute(
       path: '/goals',
       builder: (context, state) =>
@@ -107,9 +137,16 @@ final GoRouter appRouter = GoRouter(
 
     GoRoute(
       path: '/goal-details',
-      builder: (context, state) =>
-          const GoalDetailsScreen(),
+      builder: (context, state) {
+        final goal = state.extra as GoalData;
+
+        return GoalDetailsScreen(
+          goal: goal,
+        );
+      },
     ),
+
+
 
     /// INSIGHTS
     GoRoute(
