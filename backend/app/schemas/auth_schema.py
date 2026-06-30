@@ -1,5 +1,4 @@
 from pydantic import BaseModel, EmailStr
-from pydantic import BaseModel, EmailStr
 
 
 class RegisterRequest(BaseModel):
@@ -29,27 +28,6 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-class RefreshTokenRequest(BaseModel):
-    refresh_token: str
-
-
-class SendOTPRequest(BaseModel):
-    email: EmailStr
-
-
-class VerifyOTPRequest(BaseModel):
-    email: EmailStr
-    otp: str
-
-
-class ForgotPasswordRequest(BaseModel):
-    email: EmailStr
-
-
-class ResetPasswordRequest(BaseModel):
-    email: EmailStr
-    otp: str
-    new_password: str
 
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
@@ -60,6 +38,10 @@ class RefreshTokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class LogoutRequest(BaseModel):
+    refresh_token: str
+
+
 class SendOTPRequest(BaseModel):
     email: EmailStr
 
@@ -74,5 +56,3 @@ class ResetPasswordRequest(BaseModel):
     otp: str
     new_password: str
 
-class LogoutRequest(BaseModel):
-    refresh_token: str

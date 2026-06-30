@@ -3,15 +3,14 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 
 from app.services.token_service import TokenService
+from app.services.otp_service import OTPService
 
-from app.repositories.auth_repository import (
-    AuthRepository
-)
+from app.repositories.auth_repository import AuthRepository
 
 from app.core.security import (
     hash_password,
     verify_password,
-    create_access_token
+    create_access_token,
 )
 
 
@@ -24,20 +23,17 @@ class AuthService:
         email: str,
         password: str,
         age: int,
-        user_type: str
+        user_type: str,
     ):
 
-        existing_user = (
-            AuthRepository
-            .get_user_by_email(
-                db,
-                email
-            )
+        existing_user = AuthRepository.get_user_by_email(
+            db,
+            email,
         )
 
         if existing_user:
             raise ValueError(
-                "Email already registered"
+                "Email already registered",
             )
 
         user = User(
@@ -45,48 +41,42 @@ class AuthService:
             email=email,
             password_hash=hash_password(password),
             age=age,
-            user_type=user_type
+            user_type=user_type,
         )
 
-        return (
-            AuthRepository
-            .create_user(
-                db,
-                user
-            )
+        return AuthRepository.create_user(
+            db,
+            user,
         )
 
     @staticmethod
     def login_user(
         db: Session,
         email: str,
-        password: str
+        password: str,
     ):
 
-        user = (
-            AuthRepository
-            .get_user_by_email(
-                db,
-                email
-            )
+        user = AuthRepository.get_user_by_email(
+            db,
+            email,
         )
 
         if not user:
             raise ValueError(
-                "Invalid credentials"
+                "Invalid credentials",
             )
 
         if not verify_password(
             password,
-            user.password_hash
+            user.password_hash,
         ):
             raise ValueError(
-                "Invalid credentials"
+                "Invalid credentials",
             )
 
         access_token = create_access_token(
             {
-                "sub": str(user.id)
+                "sub": str(user.id),
             }
         )
 
@@ -94,40 +84,89 @@ class AuthService:
             TokenService
             .generate_refresh_token(
                 db,
-                user.id
+                user.id,
             )
         )
 
         return {
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
         }
-    
+
+    @staticmethod
+    def send_reset_otp(
+        db: Session,
+        email: str,
+    ):
+
+        user = AuthRepository.get_user_by_email(
+            db,
+            email,
+        )
+
+        if not user:
+            raise ValueError(
+                "User not found",
+            )
+
+        OTPService.generate_otp(
+            db,
+            user.id,
+        )
+
+        return {
+            "message": "OTP sent successfully",
+        }
+
+    @staticmethod
+    def verify_reset_otp(
+        db: Session,
+        email: str,
+        otp: str,
+    ):
+
+        user = AuthRepository.get_user_by_email(
+            db,
+            email,
+        )
+
+        if not user:
+            raise ValueError(
+                "User not found",
+            )
+
+        OTPService.verify_otp(
+            db,
+            user.id,
+            otp,
+        )
+
+        return {
+            "message": "OTP verified successfully",
+        }
+
     @staticmethod
     def reset_password(
         db: Session,
         email: str,
-        new_password: str
+        new_password: str,
     ):
-    
-        user = (
-            AuthRepository
-            .get_user_by_email(
-                db,
-                email
-            )
+
+        user = AuthRepository.get_user_by_email(
+            db,
+            email,
         )
-    
+
         if not user:
             raise ValueError(
-                "User not found"
+                "User not found",
             )
-    
+
         user.password_hash = hash_password(
-            new_password
+            new_password,
         )
-    
+
         db.commit()
-    
+
         return True
