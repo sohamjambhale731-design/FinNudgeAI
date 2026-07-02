@@ -5,6 +5,7 @@ class IncomeData {
   final double additionalIncome;
   final double totalIncome;
   final String month;
+  final int year;
 
   IncomeData({
     required this.incomeId,
@@ -12,6 +13,7 @@ class IncomeData {
     required this.additionalIncome,
     required this.totalIncome,
     required this.month,
+    required this.year,
   });
 
   factory IncomeData.fromJson(
@@ -34,6 +36,7 @@ class IncomeData {
               .toDouble(),
 
       month: json["month"],
+      year: json["year"],
     );
   }
 }

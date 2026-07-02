@@ -17,7 +17,7 @@ class _AddAdditionalIncomeScreenState
     extends State<AddAdditionalIncomeScreen> {
   final amountController = TextEditingController();
   final sourceController = TextEditingController();
-  final dateController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,14 +46,8 @@ class _AddAdditionalIncomeScreenState
               ),
             ),
             const SizedBox(height: 16),
-            TextField(
-              controller: dateController,
-              decoration: const InputDecoration(
-                labelText: 'Date (2026-06-20)',
-                border: OutlineInputBorder(),
-              ),
-            ),
             const SizedBox(height: 24),
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -62,8 +56,8 @@ class _AddAdditionalIncomeScreenState
                     await IncomeApi.addAdditionalIncome(
                       sourceName: sourceController.text,
                       amount: double.parse(amountController.text),
-                      date: dateController.text,
                     );
+
 
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(

@@ -36,7 +36,7 @@ class DashboardData {
 
       goal: GoalData(
         goalName:
-            json["goals_overview"]["goal_name"],
+            json["goals_overview"]["goal_name"] ?? "No Active Goal",
         currentAmount:
             (json["goals_overview"]
                     ["current_amount"])

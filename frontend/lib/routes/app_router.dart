@@ -5,6 +5,10 @@ import '../features/auth/screens/login_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
 
 import '../features/income/screens/income_screen.dart';
+
+import '../features/profile/screens/profile_screen.dart';
+import '../features/about/screens/about_screen.dart';
+
 import '../features/income/screens/add_income_screen.dart';
 import '../features/income/screens/history_screen.dart';
 import '../features/income/models/income_data.dart';
@@ -19,6 +23,11 @@ import '../features/expenses/screens/add_expense_screen.dart';
 import '../features/expenses/screens/expense_history_screen.dart';
 import '../features/expenses/screens/update_expense_screen.dart';
 import '../features/expenses/screens/update_budget_screen.dart';
+import '../features/expenses/screens/add_budget_screen.dart';
+import '../features/expenses/screens/add_fixed_expense_screen.dart';
+import '../features/expenses/screens/update_fixed_expense_screen.dart';
+
+
 
 import '../features/goals/screens/goal_screen.dart';
 import '../features/goals/screens/add_goal_screen.dart';
@@ -57,12 +66,8 @@ final GoRouter appRouter = GoRouter(
 
     GoRoute(
       path: '/add-income',
-    
       builder: (context, state) {
-      
-        final income =
-            state.extra as IncomeData;
-    
+        final income = state.extra as IncomeData?;
         return AddIncomeScreen(
           income: income,
         );
@@ -112,6 +117,29 @@ final GoRouter appRouter = GoRouter(
     ),
 
     GoRoute(
+      path: '/add-budget',
+      builder: (context, state) =>
+          const AddBudgetScreen(),
+    ),
+
+    GoRoute(
+      path: '/add-fixed-expense',
+      builder: (context, state) =>
+          const AddFixedExpenseScreen(),
+    ),
+
+    GoRoute(
+      path: '/update-fixed-expense',
+      builder: (context, state) {
+        final expense = state.extra as Map<String, dynamic>;
+
+        return UpdateFixedExpenseScreen(
+          expense: expense,
+        );
+      },
+    ),
+
+    GoRoute(
       path: '/update-budget',
       builder: (context, state) {
         final budget = state.extra as BudgetData;
@@ -120,6 +148,7 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
+
 
     /// GOALS
 
@@ -159,6 +188,18 @@ final GoRouter appRouter = GoRouter(
       path: '/insight-details',
       builder: (context, state) =>
           const InsightDetailsScreen(),
+    ),
+
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) =>
+          const ProfileScreen(),
+    ),
+
+    GoRoute(
+      path: '/about',
+      builder: (context, state) =>
+          const AboutScreen(),
     ),
   ],
 );

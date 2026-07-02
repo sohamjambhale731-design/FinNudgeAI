@@ -45,6 +45,10 @@ class Income(Base):
         String(20)
     )
 
+    year: Mapped[int] = mapped_column(
+        Integer
+    )
+
     user = relationship(
         "User",
         back_populates="incomes"

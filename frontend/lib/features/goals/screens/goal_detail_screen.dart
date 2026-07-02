@@ -94,9 +94,9 @@ class _GoalDetailsScreenState extends State<GoalDetailsScreen> {
               child: ElevatedButton.icon(
                 onPressed: () async {
                   final amountController = TextEditingController();
-                  final dateController = TextEditingController();
 
                   final confirmed = await showDialog<bool>(
+
                     context: context,
                     builder: (context) {
                       return AlertDialog(
@@ -111,14 +111,6 @@ class _GoalDetailsScreenState extends State<GoalDetailsScreen> {
                                 border: OutlineInputBorder(),
                               ),
                               keyboardType: TextInputType.number,
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: dateController,
-                              decoration: const InputDecoration(
-                                labelText: 'Date',
-                                border: OutlineInputBorder(),
-                              ),
                             ),
                           ],
                         ),
@@ -139,13 +131,13 @@ class _GoalDetailsScreenState extends State<GoalDetailsScreen> {
                   if (confirmed != true) return;
 
                   final amount = double.parse(amountController.text);
-                  final date = dateController.text;
 
                   await GoalApi.addContribution(
                     goalId: widget.goal.goalId,
                     amount: amount,
-                    date: date,
                   );
+
+
 
                   if (context.mounted) {
                     context.pop(true);

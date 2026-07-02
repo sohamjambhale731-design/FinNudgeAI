@@ -5,11 +5,8 @@ import 'package:http/http.dart' as http;
 import '../constants/api_constants.dart';
 import '../storage/token_storage.dart';
 
-class DashboardApi {
-
-  static Future<Map<String, dynamic>> getDashboard(
-    String month,
-  ) async {
+class ProfileApi {
+  static Future<Map<String, dynamic>> getProfile() async {
     final token = await TokenStorage.getAccessToken();
 
     if (token == null) {
@@ -17,7 +14,7 @@ class DashboardApi {
     }
 
     final response = await http.get(
-      Uri.parse('${ApiConstants.baseUrl}/dashboard/$month'),
+      Uri.parse('${ApiConstants.baseUrl}/dashboard/July'),
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -32,3 +29,4 @@ class DashboardApi {
     );
   }
 }
+

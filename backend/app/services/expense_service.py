@@ -1,4 +1,8 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
+
+from app.services.analytics_service import AnalyticsService
 
 from app.models.expense import (
     FixedExpense,
@@ -50,13 +54,21 @@ class ExpenseService:
             recurring=recurring
         )
 
-        return (
+        expense = (
             ExpenseRepository
             .create_fixed_expense(
                 db,
                 expense
             )
         )
+
+        AnalyticsService.generate_analytics(
+            db,
+            user_id,
+            datetime.now().strftime("%B")
+        )
+
+        return expense
 
     @staticmethod
     def get_fixed_expenses(
@@ -144,6 +156,12 @@ class ExpenseService:
             expense
         )
 
+        AnalyticsService.generate_analytics(
+            db,
+            user_id,
+            datetime.now().strftime("%B")
+        )
+
         return {
             "message": "Expense deleted"
         }
@@ -191,16 +209,22 @@ class ExpenseService:
                 expense
             )
         )
-    
+
         if budget:
-        
+
             budget.remaining_budget -= amount
-    
+
             ExpenseRepository.update_variable_budget(
                 db,
                 budget
             )
-    
+
+        AnalyticsService.generate_analytics(
+            db,
+            user_id,
+            expense_date.strftime("%B")
+        )
+
         return expense
 
 
@@ -249,13 +273,18 @@ class ExpenseService:
         expense.amount = amount
         expense.note = note
 
-        return (
-            ExpenseRepository
-            .update_variable_expense(
-                db,
-                expense
-            )
+        expense = ExpenseRepository.update_variable_expense(
+            db,
+            expense
         )
+
+        AnalyticsService.generate_analytics(
+            db,
+            user_id,
+            expense.date.strftime("%B")
+        )
+
+        return expense
 
 
     @staticmethod
@@ -361,13 +390,18 @@ class ExpenseService:
             remaining_budget=allocated_budget
         )
 
-        return (
-            ExpenseRepository
-            .create_variable_budget(
-                db,
-                budget
-            )
+        budget = ExpenseRepository.create_variable_budget(
+            db,
+            budget
         )
+
+        AnalyticsService.generate_analytics(
+            db,
+            user_id,
+            month
+        )
+
+        return budget
 
 
     @staticmethod
@@ -458,13 +492,18 @@ class ExpenseService:
             - spent_amount
         )
 
-        return (
-            ExpenseRepository
-            .update_variable_budget(
-                db,
-                budget
-            )
+        budget = ExpenseRepository.update_variable_budget(
+            db,
+            budget
         )
+
+        AnalyticsService.generate_analytics(
+            db,
+            user_id,
+            budget.month
+        )
+
+        return budget
     
     @staticmethod
     def delete_variable_budget(

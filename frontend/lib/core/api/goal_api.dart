@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import '../constants/api_constants.dart';
 import '../storage/token_storage.dart';
+
 
 class GoalApi {
   static Future<List<dynamic>> getGoals() async {
@@ -54,7 +56,6 @@ class GoalApi {
   static Future<void> addContribution({
     required int goalId,
     required double amount,
-    required String date,
   }) async {
     final token = await TokenStorage.getAccessToken();
 
@@ -66,7 +67,7 @@ class GoalApi {
       },
       body: jsonEncode({
         'amount': amount,
-        'date': date,
+        'date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
       }),
     );
 

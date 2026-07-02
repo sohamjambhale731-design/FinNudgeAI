@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/bottom_nav_bar.dart';
 
+
 import '../../../core/api/goal_api.dart';
 
 import '../models/goal_data.dart';
@@ -30,8 +31,92 @@ class _GoalScreenState extends State<GoalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Goals'),
+        title: const Text(
+          "FinNudge AI",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+
+        actions: [
+          IconButton(
+            icon: const CircleAvatar(
+              radius: 16,
+              child: Icon(Icons.person, size: 18),
+            ),
+            onPressed: () {
+              context.push('/profile');
+            },
+          ),
+          const SizedBox(width: 10),
+        ],
       ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.teal,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    child: Icon(Icons.person, size: 30),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    "FinNudge AI",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text("Profile"),
+              onTap: () {
+                context.push('/profile');
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text("About"),
+              onTap: () {
+                context.push('/about');
+              },
+            ),
+
+            const Divider(),
+
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () {
+                context.go('/');
+              },
+            ),
+          ],
+        ),
+      ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

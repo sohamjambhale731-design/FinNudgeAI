@@ -78,16 +78,18 @@ class IncomeRepository:
         )
     
     @staticmethod
-    def get_income_by_user_and_month(
+    def get_income_by_user_and_month_and_year(
         db: Session,
         user_id: int,
-        month: str
+        month: str,
+        year: int
     ):
         return (
             db.query(Income)
             .filter(
                 Income.user_id == user_id,
-                func.lower(Income.month) == month.lower()
+                func.lower(Income.month) == month.lower(),
+                Income.year == year
             )
             .first()
         )

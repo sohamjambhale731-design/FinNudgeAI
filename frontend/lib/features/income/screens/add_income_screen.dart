@@ -5,33 +5,38 @@ import '../../../core/api/income_api.dart';
 import '../models/income_data.dart';
 
 class AddIncomeScreen extends StatefulWidget {
-  final IncomeData income;
+  final IncomeData? income;
 
   const AddIncomeScreen({
     super.key,
-    required this.income,
+    this.income,
   });
 
   @override
-  State<AddIncomeScreen> createState() => _AddIncomeScreenState();
+  State<AddIncomeScreen> createState() =>
+      _AddIncomeScreenState();
 }
 
 class _AddIncomeScreenState extends State<AddIncomeScreen> {
   late TextEditingController amountController;
 
+
   @override
   void initState() {
     super.initState();
 
-    amountController =
-        TextEditingController(text: widget.income.primaryIncome.toString());
+    amountController = TextEditingController(
+      text: widget.income?.primaryIncome.toString() ?? "",
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Income'),
+        title: Text(
+          widget.income == null ? 'Add Income' : 'Update Income',
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -51,15 +56,27 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
               child: ElevatedButton(
                 onPressed: () async {
                   try {
-                    await IncomeApi.updateIncome(
-                      incomeId: widget.income.incomeId,
-                      primaryIncome: double.parse(amountController.text),
-                    );
+                    if (widget.income == null) {
+                      // First income
+                      await IncomeApi.addIncome(
+                        primaryIncome: double.parse(amountController.text),
+                      );
+                    } else {
+                      // Existing income
+                      await IncomeApi.updateIncome(
+                        incomeId: widget.income!.incomeId,
+                        primaryIncome: double.parse(amountController.text),
+                      );
+                    }
 
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Income Updated"),
+                        SnackBar(
+                          content: Text(
+                            widget.income == null
+                                ? "Income Added"
+                                : "Income Updated",
+                          ),
                         ),
                       );
                       context.pop(true);
@@ -72,7 +89,9 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                     );
                   }
                 },
-                child: const Text('Update Income'),
+                child: Text(
+                  widget.income == null ? "Add Income" : "Update Income",
+                ),
               ),
             ),
           ],

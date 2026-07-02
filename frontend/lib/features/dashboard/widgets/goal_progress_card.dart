@@ -16,7 +16,9 @@ class GoalProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = data.currentAmount / data.targetAmount;
+    final progress = data.targetAmount == 0
+        ? 0.0
+        : (data.currentAmount / data.targetAmount).clamp(0.0, 1.0);
     final remaining = data.targetAmount - data.currentAmount;
 
     return DashboardCard(

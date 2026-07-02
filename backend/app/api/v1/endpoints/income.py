@@ -48,7 +48,8 @@ def create_income(
             db,
             current_user.id,
             request.primary_income,
-            request.month
+            request.month,
+            request.year
         )
     )
 

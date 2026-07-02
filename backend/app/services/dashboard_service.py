@@ -199,22 +199,13 @@ class DashboardService:
 
             "goals_overview": {
                 "goal_name":
-                    goals[0].goal_name
-                    if goals else None,
-            
+                    goals[0].goal_name if goals else "No Active Goal",
                 "current_amount":
-                    goals[0].current_amount
-                    if goals else 0,
-            
+                    goals[0].current_amount if goals else 0,
                 "target_amount":
-                    goals[0].target_amount
-                    if goals else 0,
-            
+                    goals[0].target_amount if goals else 0,
                 "next_goal":
-                    goals[1].goal_name
-                    if len(goals) > 1
-                    else None,
-            
+                    goals[1].goal_name if len(goals) > 1 else "",
                 "active_goals":
                     len(goals)
             },
