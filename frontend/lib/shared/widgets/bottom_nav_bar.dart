@@ -12,26 +12,31 @@ class FinNudgeBottomNavBar extends StatelessWidget {
   });
 
   static const _items = [
+
     (
       icon: Icons.dashboard_rounded,
       label: 'Dashboard',
-      route: '/',
+      route: '/dashboard',
     ),
+
     (
       icon: Icons.account_balance_wallet_rounded,
       label: 'Income',
       route: '/income',
     ),
+
     (
       icon: Icons.receipt_long_rounded,
       label: 'Expenses',
       route: '/expenses',
     ),
+
     (
       icon: Icons.flag_rounded,
       label: 'Goals',
       route: '/goals',
     ),
+
     (
       icon: Icons.auto_graph_rounded,
       label: 'Insights',
@@ -71,35 +76,67 @@ class FinNudgeBottomNavBar extends StatelessWidget {
           children: List.generate(
             _items.length,
             (index) {
+
               final item = _items[index];
+
               final isSelected =
                   currentIndex == index;
 
               return Expanded(
                 child: InkWell(
+
                   borderRadius:
-                      BorderRadius.circular(16),
-                  onTap: () =>
-                      context.go(item.route),
+                      BorderRadius.circular(
+                    16,
+                  ),
+
+                  onTap: () {
+
+                    if (index ==
+                        currentIndex) {
+                      return;
+                    }
+
+                    context.go(
+                      item.route,
+                    );
+                  },
+
                   child: AnimatedContainer(
                     duration:
-                        const Duration(milliseconds: 200),
+                        const Duration(
+                      milliseconds: 200,
+                    ),
+
                     padding:
-                        const EdgeInsets.symmetric(
+                        const EdgeInsets
+                            .symmetric(
                       vertical: 6,
                     ),
-                    decoration: BoxDecoration(
+
+                    decoration:
+                        BoxDecoration(
                       color: isSelected
                           ? Colors.white
                           : Colors.transparent,
+
                       borderRadius:
-                          BorderRadius.circular(16),
+                          BorderRadius
+                              .circular(
+                        16,
+                      ),
                     ),
+
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisSize:
+                          MainAxisSize.min,
+
                       mainAxisAlignment:
-                          MainAxisAlignment.center,
+                          MainAxisAlignment
+                              .center,
+
                       children: [
+
                         Icon(
                           item.icon,
                           size: 20,
@@ -108,21 +145,36 @@ class FinNudgeBottomNavBar extends StatelessWidget {
                               : Colors.black54,
                         ),
 
-                        const SizedBox(height: 2),
+                        const SizedBox(
+                          height: 2,
+                        ),
 
                         Text(
                           item.label,
+
                           maxLines: 1,
+
                           overflow:
-                              TextOverflow.ellipsis,
-                          style: TextStyle(
+                              TextOverflow
+                                  .ellipsis,
+
+                          style:
+                              TextStyle(
                             fontSize: 11,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w500,
-                            color: isSelected
-                                ? AppColors.goal
-                                : Colors.black54,
+
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight
+                                        .w700
+                                    : FontWeight
+                                        .w500,
+
+                            color:
+                                isSelected
+                                    ? AppColors
+                                        .goal
+                                    : Colors
+                                        .black54,
                           ),
                         ),
                       ],

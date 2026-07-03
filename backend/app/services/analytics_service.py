@@ -41,20 +41,18 @@ class AnalyticsService:
 
         month = month.strip().title()
 
-        existing_analytics = (
-            AnalyticsRepository
-            .get_analytics_by_month(
-                db,
-                user_id,
-                month
-            )
+        AnalyticsRepository.delete_analytics_by_month(
+            db,
+            user_id,
+            month
         )
 
-        if existing_analytics:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Analytics already exists for {month}"
-            )
+        AnalyticsRepository.delete_nudges_by_user(
+            db,
+            user_id
+        )
+
+
 
         incomes = (
             IncomeRepository
@@ -240,6 +238,8 @@ class AnalyticsService:
             + consistency_score
         )
 
+
+
         analytics = Analytics(
             user_id=user_id,
             month=month,
@@ -251,6 +251,7 @@ class AnalyticsService:
             ),
             financial_health_score=financial_health_score
         )
+
 
         AnalyticsRepository.create_analytics(
             db,

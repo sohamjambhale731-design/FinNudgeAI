@@ -43,8 +43,8 @@ class AIInsightCard extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          const Text(
-            "Spending Improved",
+          Text(
+            data.title,
             style: TextStyle(
               color: Colors.white70,
               fontSize: 15,
@@ -71,7 +71,7 @@ class AIInsightCard extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    "↓ 12%",
+                    "💡",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -82,13 +82,13 @@ class AIInsightCard extends StatelessWidget {
 
                 const SizedBox(width: 18),
 
-                const Expanded(
+                Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Saved ₹320",
+                        data.message,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -99,7 +99,7 @@ class AIInsightCard extends StatelessWidget {
                       SizedBox(height: 4),
 
                       Text(
-                        "Food & Dining",
+                        "AI Recommendation",
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 13,

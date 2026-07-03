@@ -30,13 +30,10 @@ from app.services.otp_service import OTPService
 from app.schemas.auth_schema import (
     SendOTPRequest,
     VerifyOTPRequest,
-    ResetPasswordRequest
+    ResetPasswordRequest,
 )
-from app.services.auth_service import (
-    AuthService
-)
-
-from app.repositories.auth_repository import(AuthRepository)
+from app.services.auth_service import AuthService
+from app.repositories.auth_repository import AuthRepository
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
@@ -229,38 +226,63 @@ def verify_otp(
         "message": "OTP verified"
     }
 
+@router.post("/send-reset-otp")
+def send_reset_otp(
+    request: SendOTPRequest,
+    db: Session = Depends(get_db),
+):
+
+    try:
+        return (
+            AuthService
+            .send_reset_otp(
+                db,
+                request.email,
+            )
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+        )
+
+
 @router.post("/reset-password")
 def reset_password(
     request: ResetPasswordRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
 
-    user = (
-        AuthRepository
-        .get_user_by_email(
+    try:
+        user = AuthRepository.get_user_by_email(
             db,
-            request.email
+            request.email,
         )
-    )
 
-    if not user:
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="User not found",
+            )
+
+        OTPService.verify_otp(
+            db,
+            user.id,
+            request.otp,
+        )
+
+        AuthService.reset_password(
+            db,
+            request.email,
+            request.new_password,
+        )
+
+        return {
+            "message": "Password reset successful",
+        }
+
+    except ValueError as e:
         raise HTTPException(
-            status_code=404,
-            detail="User not found"
+            status_code=400,
+            detail=str(e),
         )
-
-    OTPService.verify_otp(
-        db,
-        user.id,
-        request.otp
-    )
-
-    AuthService.reset_password(
-        db,
-        request.email,
-        request.new_password
-    )
-
-    return {
-        "message": "Password reset successful"
-    }

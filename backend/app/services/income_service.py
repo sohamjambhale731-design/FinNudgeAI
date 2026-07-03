@@ -17,15 +17,17 @@ class IncomeService:
         db: Session,
         user_id: int,
         primary_income: float,
-        month: str
+        month: str,
+        year: int
     ):
         month = month.strip().title()
         existing_income = (
             IncomeRepository
-            .get_income_by_user_and_month(
+            .get_income_by_user_and_month_and_year(
                 db,
                 user_id,
-                month
+                month,
+                year
             )
         )
 
@@ -39,7 +41,8 @@ class IncomeService:
             primary_income=primary_income,
             total_additional_income=0,
             total_income=primary_income,
-            month=month
+            month=month,
+            year=year
         )
 
         return (
@@ -257,3 +260,32 @@ class IncomeService:
             })
 
         return analytics
+    
+    @staticmethod
+    def get_income_history(
+        db: Session,
+        user_id: int
+    ):
+    
+        records = (
+            IncomeRepository
+            .get_additional_income(
+                db,
+                user_id
+            )
+        )
+    
+        return [
+            {
+                "source_name":
+                    record.source_name,
+    
+                "amount":
+                    record.amount,
+    
+                "date":
+                    record.date
+            }
+    
+            for record in records
+        ]

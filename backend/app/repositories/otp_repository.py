@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.models.otp_verification import OTPVerification
+from app.models.user import User
 
 
 class OTPRepository:
@@ -31,3 +32,17 @@ class OTPRepository:
             )
             .first()
         )
+    
+    @staticmethod
+    def get_user_email(
+        db: Session,
+        user_id: int,
+    ):
+    
+        user = (
+            db.query(User)
+            .filter(User.id == user_id)
+            .first()
+        )
+    
+        return user.email

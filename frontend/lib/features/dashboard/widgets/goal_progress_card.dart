@@ -16,7 +16,9 @@ class GoalProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = data.currentAmount / data.targetAmount;
+    final progress = data.targetAmount == 0
+        ? 0.0
+        : (data.currentAmount / data.targetAmount).clamp(0.0, 1.0);
     final remaining = data.targetAmount - data.currentAmount;
 
     return DashboardCard(
@@ -218,7 +220,9 @@ class GoalProgressCard extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 Text(
-                  data.upcomingGoals.first,
+                  data.upcomingGoals.isNotEmpty
+                      ? data.upcomingGoals.first
+                      : "No Upcoming Goal",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,

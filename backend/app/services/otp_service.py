@@ -4,11 +4,13 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
+from app.services.email_service import EmailService
 from app.models.otp_verification import OTPVerification
 
 from app.repositories.otp_repository import (
     OTPRepository
 )
+from app.repositories.auth_repository import AuthRepository
 
 
 class OTPService:
@@ -16,13 +18,13 @@ class OTPService:
     @staticmethod
     def generate_otp(
         db: Session,
-        user_id: int
+        user_id: int,
     ):
 
         otp_code = str(
             random.randint(
                 100000,
-                999999
+                999999,
             )
         )
 
@@ -30,12 +32,22 @@ class OTPService:
             user_id=user_id,
             otp_code=otp_code,
             expires_at=datetime.utcnow()
-            + timedelta(minutes=10)
+            + timedelta(minutes=10),
         )
 
         OTPRepository.create(
             db,
-            otp
+            otp,
+        )
+
+        user = AuthRepository.get_user_by_id(
+            db,
+            user_id,
+        )
+
+        EmailService.send_otp_email(
+            user.email,
+            otp_code,
         )
 
         return otp_code

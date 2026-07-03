@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class IncomeCreate(BaseModel):
     primary_income: float
     month: str
+    year: int
 
 
 class IncomeUpdate(BaseModel):
@@ -24,6 +25,7 @@ class IncomeResponse(BaseModel):
     total_additional_income: float
     total_income: float
     month: str
+    year: int
 
     class Config:
         from_attributes = True

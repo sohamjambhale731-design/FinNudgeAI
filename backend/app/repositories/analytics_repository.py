@@ -47,7 +47,41 @@ class AnalyticsRepository:
         )
 
     @staticmethod
+    def delete_analytics_by_month(
+        db: Session,
+        user_id: int,
+        month: str
+    ):
+        (
+            db.query(Analytics)
+            .filter(
+                Analytics.user_id == user_id,
+                Analytics.month == month
+            )
+            .delete()
+        )
+
+        db.commit()
+
+    @staticmethod
+    def delete_nudges_by_user(
+        db: Session,
+        user_id: int
+    ):
+        (
+            db.query(AINudge)
+            .filter(
+                AINudge.user_id == user_id
+            )
+            .delete()
+        )
+
+        db.commit()
+
+
+    @staticmethod
     def create_nudge(
+
         db: Session,
         nudge: AINudge
     ):
