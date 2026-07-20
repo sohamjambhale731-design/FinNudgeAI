@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/colors/app_colors.dart';
 import '../../../shared/widgets/dashboard_card.dart';
@@ -264,13 +265,7 @@ class WalletSummaryCard extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Add Transaction coming soon',
-                    ),
-                  ),
-                );
+                context.push('/expenses');
               },
               icon: const Icon(Icons.add),
               label: const Text(

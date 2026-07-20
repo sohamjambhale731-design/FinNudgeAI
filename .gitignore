@@ -27,3 +27,5 @@ android/local.properties
 *.log
 
 graphify-out/
+
+*.sql

@@ -74,6 +74,14 @@ class DashboardService:
             )
         )
 
+        additional_incomes = (
+            IncomeRepository
+            .get_additional_income(
+                db,
+                user_id
+            )
+        )
+
         analytics = (
             AnalyticsRepository
             .get_analytics(
@@ -173,9 +181,77 @@ class DashboardService:
             else None
         )
 
+        recent_transactions = []
+
+        # Income (use the primary income as "Salary")
+        for income in incomes:
+            if income.month != month:
+                continue
+            # Income model has month/year, convert to a concrete date for sorting
+            # Construct first day of the income month/year (Income model doesn't store a date)
+            from datetime import date, datetime
+            month_number = datetime.strptime(income.month, "%B").month
+            txn_date = date(income.year, month_number, 1)
+
+            recent_transactions.append({
+                "type": "income",
+                "category": "Salary",
+                "note": "Monthly Salary",
+                "amount": income.total_income,
+                "date": txn_date
+            })
+
+        # Additional Income
+        for income in additional_incomes:
+            recent_transactions.append({
+
+                "type": "income",
+                "category": "Additional Income",
+                "note": income.source_name,
+                "amount": income.amount,
+                "date": income.date
+
+            })
+
+        # Variable expenses
+        recent_transactions.extend([
+            {
+                "type": "expense",
+                "category": expense.category,
+                "note": expense.note,
+                "amount": expense.amount,
+                "date": expense.date
+            }
+            for expense in variable_expenses
+            if expense.date.strftime("%B") == month
+        ])
+
+
+        # Goal contributions
+        for goal in goals:
+            contributions = GoalRepository.get_contributions(db, goal.goal_id)
+            for contribution in contributions:
+                recent_transactions.append({
+                    "type": "goal",
+                    "category": "Savings",
+                    "note": f"Contribution to {goal.goal_name}",
+                    "amount": contribution.amount,
+                    "date": contribution.date
+                })
+
+        # Sort newest first and take latest 5
+        recent_transactions.sort(key=lambda x: x["date"], reverse=True)
+        recent_transactions = recent_transactions[:3]
+
+        for transaction in recent_transactions:
+            if transaction["date"] is not None:
+                transaction["date"] = transaction["date"].isoformat()
+
+
         return {
 
             "wallet_summary": {
+
                 "total_income": total_income,
                 "total_expense": total_expense,
                 "total_saved": total_saved
@@ -210,13 +286,7 @@ class DashboardService:
                     len(goals)
             },
 
-           "recent_transactions": [
-                {
-                    "name": expense.category,
-                    "amount": expense.amount
-                }
-                for expense in variable_expenses[:5]
-            ],
+            "recent_transactions": recent_transactions,
 
             "money_streak": {
                 "current_streak":

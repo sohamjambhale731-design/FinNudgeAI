@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/colors/app_colors.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/dashboard_card.dart';
 import '../models/goal_data.dart';
@@ -247,13 +248,7 @@ class GoalProgressCard extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Add Contribution coming soon',
-                    ),
-                  ),
-                );
+                context.push('/goals');
               },
               icon: const Icon(Icons.add),
               label: const Text(

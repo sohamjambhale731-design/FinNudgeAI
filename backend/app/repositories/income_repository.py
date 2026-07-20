@@ -65,19 +65,6 @@ class IncomeRepository:
         return additional_income
 
     @staticmethod
-    def get_additional_income(
-        db: Session,
-        user_id: int
-    ):
-        return (
-            db.query(AdditionalIncome)
-            .filter(
-                AdditionalIncome.user_id == user_id
-            )
-            .all()
-        )
-    
-    @staticmethod
     def get_income_by_user_and_month_and_year(
         db: Session,
         user_id: int,
@@ -104,7 +91,7 @@ class IncomeRepository:
         db.refresh(income)
     
         return income
-    
+
     @staticmethod
     def get_additional_income(
         db: Session,
@@ -114,9 +101,6 @@ class IncomeRepository:
             db.query(AdditionalIncome)
             .filter(
                 AdditionalIncome.user_id == user_id
-            )
-            .order_by(
-                AdditionalIncome.date.desc()
             )
             .all()
         )
