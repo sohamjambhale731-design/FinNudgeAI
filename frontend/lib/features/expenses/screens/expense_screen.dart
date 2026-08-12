@@ -184,6 +184,19 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 );
               }
 
+              final currentMonth =
+                  DateFormat('MMMM').format(DateTime.now());
+
+              final currentBudgetJson =
+                  budgetSnapshot.data!
+                      .cast<Map<String, dynamic>>()
+                      .where(
+                        (budget) =>
+                            budget['month']?.toString().toLowerCase() ==
+                            currentMonth.toLowerCase(),
+                      )
+                      .toList();
+
               // ==========================
               // NO BUDGET
               // ==========================
@@ -238,16 +251,6 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               }
 
               // Budget exists
-              final currentMonth =
-                  DateFormat('MMMM').format(DateTime.now());
-
-              final currentBudgetJson =
-                  budgetSnapshot.data!.cast<Map<String, dynamic>>().where(
-                    (budget) =>
-                        budget['month']?.toString().toLowerCase() ==
-                        currentMonth.toLowerCase(),
-                  ).toList();
-
               final BudgetData? budget =
                   currentBudgetJson.isNotEmpty
                       ? BudgetData.fromJson(
