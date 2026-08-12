@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 
 import '../../../core/api/expense_api.dart';
@@ -137,12 +138,41 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             );
           }
 
-          final expenses = expenseSnapshot.data!;
+          final allExpenses = expenseSnapshot.data!;
+
+          final now = DateTime.now();
+
+          final currentMonth = now.month;
+          final currentYear = now.year;
+
+          final expenses = allExpenses.where((expense) {
+            final rawDate = expense['date'];
+
+            if (rawDate == null) {
+              return false;
+            }
+
+            try {
+              final date = DateTime.parse(rawDate.toString());
+
+              return date.month == currentMonth &&
+                  date.year == currentYear;
+            } catch (_) {
+              return false;
+            }
+          }).toList();
 
           final totalExpense = expenses.fold<double>(
             0,
-            (sum, expense) =>
-                sum + (expense['amount'] as num).toDouble(),
+            (sum, expense) {
+              final amount = expense['amount'];
+
+              if (amount == null) {
+                return sum;
+              }
+
+              return sum + (amount as num).toDouble();
+            },
           );
 
           return FutureBuilder<List<dynamic>>(
@@ -157,7 +187,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               // ==========================
               // NO BUDGET
               // ==========================
-              if (budgetSnapshot.data!.isEmpty) {
+              if (currentBudgetJson.isEmpty) {
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(30),
@@ -208,10 +238,22 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               }
 
               // Budget exists
-              final budget = BudgetData.fromJson(
-                budgetSnapshot.data!.first
-                    as Map<String, dynamic>,
-              );
+              final currentMonth =
+                  DateFormat('MMMM').format(DateTime.now());
+
+              final currentBudgetJson =
+                  budgetSnapshot.data!.cast<Map<String, dynamic>>().where(
+                    (budget) =>
+                        budget['month']?.toString().toLowerCase() ==
+                        currentMonth.toLowerCase(),
+                  ).toList();
+
+              final BudgetData? budget =
+                  currentBudgetJson.isNotEmpty
+                      ? BudgetData.fromJson(
+                          currentBudgetJson.first,
+                        )
+                      : null;
 
               // ==========================
               // NO EXPENSES
@@ -238,7 +280,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Monthly Budget : ₹${budget.allocatedBudget.toStringAsFixed(0)}',
+                          'Monthly Budget : ₹${budget?.allocatedBudget.toStringAsFixed(0) ?? 0}',
                           style: const TextStyle(
                             fontSize: 18,
                           ),
@@ -319,7 +361,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           child: ListTile(
                             title: const Text('Variable Budget'),
                             subtitle: Text(
-                              '₹${budget.allocatedBudget.toStringAsFixed(0)}',
+                              '₹${budget?.allocatedBudget.toStringAsFixed(0) ?? 0}',
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.edit),
@@ -340,7 +382,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           child: ListTile(
                             title: const Text('Remaining Budget'),
                             subtitle: Text(
-                              '₹${budget.remainingBudget.toStringAsFixed(0)}',
+                              '₹${budget?.remainingBudget.toStringAsFixed(0) ?? 0}',
                             ),
                           ),
                         ),

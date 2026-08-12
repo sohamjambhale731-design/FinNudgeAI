@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../shared/widgets/bottom_nav_bar.dart';
 
 
@@ -134,7 +135,26 @@ class _IncomeScreenState
             final incomeList =
                 snapshot.data!;
 
-            if (incomeList.isEmpty) {
+            final currentMonth =
+                DateFormat('MMMM').format(DateTime.now());
+
+            final currentYear =
+                DateTime.now().year;
+
+            final currentMonthIncome =
+                incomeList.where((item) {
+              final month =
+                  item['month']?.toString();
+
+              final year =
+                  item['year'];
+
+              return month?.toLowerCase() ==
+                      currentMonth.toLowerCase() &&
+                  year == currentYear;
+            }).toList();
+
+            if (currentMonthIncome.isEmpty) {
               return Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
@@ -153,9 +173,9 @@ class _IncomeScreenState
 
                       const SizedBox(height: 30),
 
-                      const Text(
-                        "No Income Yet",
-                        style: TextStyle(
+                      Text(
+                        "No Income For $currentMonth",
+                        style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
@@ -283,7 +303,7 @@ class _IncomeScreenState
 
             final income =
                 IncomeData.fromJson(
-              incomeList.first,
+              currentMonthIncome.first,
             );
 
             return SingleChildScrollView(

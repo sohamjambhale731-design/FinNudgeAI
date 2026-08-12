@@ -50,7 +50,9 @@ class SavingsInsightCard extends StatelessWidget {
                 leading: const Icon(Icons.flag),
                 title: Text(goal.goalName),
                 subtitle: Text(
-                  "${goal.months.toStringAsFixed(1)} months remaining",
+                  goal.months == null
+                      ? "Unable to estimate completion time"
+                      : "${goal.months!.toStringAsFixed(1)} months remaining",
                 ),
                 trailing: Text(
                   "₹${goal.remainingAmount.toStringAsFixed(0)}",
